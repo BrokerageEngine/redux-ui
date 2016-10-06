@@ -5,7 +5,7 @@ const { any, array, func, node, object, string } = PropTypes;
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import invariant from 'invariant';
-import shallowCompare from 'react-addons-shallow-compare';
+import shallowCompare from 'react-pure-render/shallowEqual';
 import { updateUI, massUpdateUI, setDefaultUI, mountUI, unmountUI } from './action-reducer';
 
 import { getUIState } from './utils';
