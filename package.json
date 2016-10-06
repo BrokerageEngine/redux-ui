@@ -1,5 +1,5 @@
 {
-  "name": "@mmiller42/redux-ui",
+  "name": "redux-ui-shallow",
   "version": "0.1.0",
   "description": "UI state management for Redux and React",
   "main": "transpiled/index.js",
