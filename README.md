@@ -1,6 +1,6 @@
 # redux-ui: ui state without profanity
 
-**NOTE:** This project is forked from [https://github.com/tonyhb/redux-ui](tonyhb/redux-ui). I noticed that whenever any slice of UI state changed, every component with the `@ui()` decorator was re-rendering, even if the components were decorated with `@pureRender`.
+**NOTE:** This project is forked from [tonyhb/redux-ui](https://github.com/tonyhb/redux-ui). I noticed that whenever any slice of UI state changed, every component with the `@ui()` decorator was re-rendering, even if the components were decorated with `@pureRender`.
 
 This was because of two problems:
 
@@ -9,7 +9,9 @@ This was because of two problems:
 
 In order to fix the second issue in your app:
 
-1. Replace `redux-ui` with the `redux-ui-shallow` package.
+1. Uninstall redux-ui: `npm uninstall redux-ui --save`
+1. Install redux-ui-shallow: `npm install redux-ui-shallow --save`
+1. Replace import references to redux-ui with redux-ui-shallow in your components and root reducer
 1. Add `shallowCompare: true` to your `@ui()` decorators' options, e.g.
 
    ```js
