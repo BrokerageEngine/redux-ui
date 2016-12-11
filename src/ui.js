@@ -34,6 +34,34 @@ export default function ui(key, opts = {}) {
 
   return (WrappedComponent) => {
 
+    if (typeof WrappedComponent.propTypes === 'object') {
+			WrappedComponent.propTypes = {
+				updateUI: PropTypes.func.isRequired,
+				...WrappedComponent.propTypes
+			};
+
+      if (opts.state && typeof opts.state === 'object') {
+        WrappedComponent.propTypes = {
+					ui: PropTypes.shape(walkUiProps(opts.state)).isRequired,
+          ...WrappedComponent.propTypes
+        };
+      }
+    }
+
+		function walkUiProps(props) {
+			const uiPropTypes = {};
+			Object.keys(props).forEach(key => {
+				const value = props[key];
+				if (typeof value === 'object') {
+					const shape = walkUiProps(value);
+					uiPropTypes[key] = PropTypes.shape(shape);
+				} else {
+					uiPropTypes[key] = any.isRequired;
+				}
+			});
+			return uiPropTypes;
+		}
+
     // Return a parent UI class which scopes all UI state to the given key
     return connector(
       /**
