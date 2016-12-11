@@ -34,7 +34,7 @@ export default function ui(key, opts = {}) {
 
   return (WrappedComponent) => {
 
-    if (typeof WrappedComponent.propTypes === 'object') {
+    if (WrappedComponent.propTypes && typeof WrappedComponent.propTypes === 'object') {
 			WrappedComponent.propTypes = {
 				updateUI: PropTypes.func.isRequired,
 				...WrappedComponent.propTypes
@@ -52,7 +52,7 @@ export default function ui(key, opts = {}) {
 			const uiPropTypes = {};
 			Object.keys(props).forEach(key => {
 				const value = props[key];
-				if (typeof value === 'object') {
+				if (value && typeof value === 'object') {
 					const shape = walkUiProps(value);
 					uiPropTypes[key] = PropTypes.shape(shape);
 				} else {
