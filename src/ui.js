@@ -1,7 +1,7 @@
 'use strict';
 
-import React, { Component, PropTypes } from 'react';
-const { any, array, func, node, object, string } = PropTypes;
+import React, { Component } from 'react';
+import { any, array, func, node, object, string } from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import invariant from 'invariant';
@@ -33,34 +33,6 @@ export default function ui(key, opts = {}) {
   );
 
   return (WrappedComponent) => {
-
-    if (WrappedComponent.propTypes && typeof WrappedComponent.propTypes === 'object') {
-			WrappedComponent.propTypes = {
-				updateUI: PropTypes.func.isRequired,
-				...WrappedComponent.propTypes
-			};
-
-      if (opts.state && typeof opts.state === 'object') {
-        WrappedComponent.propTypes = {
-					ui: PropTypes.shape(walkUiProps(opts.state)).isRequired,
-          ...WrappedComponent.propTypes
-        };
-      }
-    }
-
-		function walkUiProps(props) {
-			const uiPropTypes = {};
-			Object.keys(props).forEach(key => {
-				const value = props[key];
-				if (value && typeof value === 'object') {
-					const shape = walkUiProps(value);
-					uiPropTypes[key] = PropTypes.shape(shape);
-				} else {
-					uiPropTypes[key] = any.isRequired;
-				}
-			});
-			return uiPropTypes;
-		}
 
     // Return a parent UI class which scopes all UI state to the given key
     return connector(
@@ -99,8 +71,8 @@ export default function ui(key, opts = {}) {
           // components with no explicit key
           if (key === undefined) {
             this.key = (WrappedComponent.displayName ||
-              WrappedComponent.name) +
-              Math.floor(Math.random() * (1 << 30)).toString(16);
+                   WrappedComponent.name) +
+                   Math.floor(Math.random() * (1 << 30)).toString(16);
           } else {
             this.key = key;
           }
@@ -313,21 +285,17 @@ export default function ui(key, opts = {}) {
           const ui = getUIState(this.context.store.getState());
 
           const result = Object.keys(this.uiVars).reduce((props, k) => {
-              props[k] = ui.getIn(this.uiVars[k].concat(k));
-              return props;
-            }, {}) || {};
+            props[k] = ui.getIn(this.uiVars[k].concat(k));
+            return props;
+          }, {}) || {};
 
           // If this slice of the UI has not changed (shallow comparison),
           // then use an old copy of the slice to prevent unnecessary
           // re-rendering
-          if (opts.shallowCompare) {
-            if (!shallowCompare(this.__previousMergeResult, result)) {
-              this.__previousMergeResult = result;
-            }
-            return this.__previousMergeResult;
-          } else {
-            return result;
+          if (!shallowCompare(this.__previousMergeResult, result)) {
+            this.__previousMergeResult = result;
           }
+            return this.__previousMergeResult;
         }
 
         render() {
@@ -344,4 +312,4 @@ export default function ui(key, opts = {}) {
       }
     );
   }
-};
+}

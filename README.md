@@ -1,38 +1,6 @@
+[![Circle CI](https://circleci.com/gh/tonyhb/redux-ui.svg?style=svg)](https://circleci.com/gh/tonyhb/redux-ui)
+
 # redux-ui: ui state without profanity
-
-**NOTE:** This project is forked from [tonyhb/redux-ui](https://github.com/tonyhb/redux-ui). I noticed that whenever any slice of UI state changed, every component with the `@ui()` decorator was re-rendering, even if the components were decorated with `@pureRender`.
-
-This was because of two problems:
-
-* Some methods were being bound at runtime. I changed them to bind in the constructor so the same references can be passed as props every time.
-* Each component decorated with `@ui()` is connected to the entire `ui` object on the global store, but it only receives a small slice of that state (i.e. the "scoped" properties). Every time any component updated a UI property, all components decorated with `@ui()` receive new state, even if none of the properties in the slice they're scoped to changed.
-
-In order to fix the second issue in your app:
-
-1. Uninstall redux-ui: `npm uninstall redux-ui --save`
-1. Install redux-ui-shallow: `npm install redux-ui-shallow --save`
-1. Replace import references to redux-ui with redux-ui-shallow in your components and root reducer
-1. Add `shallowCompare: true` to your `@ui()` decorators' options, e.g.
-
-   ```js
-   import React, {Component} from 'react';
-   import ui from 'redux-ui-shallow';
-   import pureRender from 'pure-render-decorator';
-
-   @ui({
-     state: {
-       isShown: true
-     },
-     shallowCompare: true
-   }
-   @pureRender
-   export default class MyComponent extends Component {
-   };
-   ```
-
-Now only when the slice of relevant UI state is updated will the component re-render. Note that a shallow comparison algorithm is used, so when updating the UI properties, be careful to replace rather than manipulate objects and arrays.
-
---
 
 Think of redux-ui as **block-level scoping** for UI state. In this example each block-scope represents a component, and each variable represents a UI state key:
 
@@ -133,6 +101,18 @@ The decorator takes an object of options:
     // You can set default UI state based on the component's props and the
     // global store's state.
     uiVar2: (props, state) => state.router.location.query.searchTerm
+  },
+  // customReducer: you can handle the UI state for this component's scope by dispatching actions
+  reducer: (state, action) => {
+    // state represents *only* the UI state for this component's scope - not any children
+    switch(action.type) {
+      case '@@reduxReactRouter/routerDidChange':
+        if (action.payload.location.query.extra_filters) {
+          return state.set('extraFilters', true);
+        }
+      }
+      return state;
+    }
   },
   // optional mergeProps passed to react-redux' @connect
   mergeProps: () => ({}),
@@ -248,3 +228,4 @@ All of these goals should be easy to achieve.
 MIT license.
 
 Written by [Franklin Ta](https://github.com/fta2012) and [Tony Holdstock-Brown](https://github.com/tonyhb).
+

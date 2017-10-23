@@ -1,8 +1,8 @@
 'use strict';
 
-import { assert } from 'chai'; 
+import { assert } from 'chai';
 import React, { Component } from 'react';
-import TestUtils from 'react-addons-test-utils';
+import ReactTestUtils from 'react-dom/test-utils';
 import shallowEqual from 'react-redux/lib/utils/shallowEqual';
 
 import ui, { reducer } from '../../src';
@@ -44,6 +44,6 @@ describe('@connect options', () => {
       options: { withRef: false }
     })(Child);
     wrapped = renderAndFind(<WithoutRef />, WithoutRef);
-    assert.throws(() => wrapped.getWrappedInstance(), 'To access the wrapped instance, you need to specify { withRef: true } as the fourth argument of the connect() call.');
+    assert.throws(() => wrapped.getWrappedInstance(), 'To access the wrapped instance, you need to specify { withRef: true } in the options argument of the connect() call.');
   });
 });

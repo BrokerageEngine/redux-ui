@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -17,6 +17,8 @@ exports.default = ui;
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = require('prop-types');
 
 var _redux = require('redux');
 
@@ -42,12 +44,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var any = _react.PropTypes.any,
-    array = _react.PropTypes.array,
-    func = _react.PropTypes.func,
-    node = _react.PropTypes.node,
-    object = _react.PropTypes.object,
-    string = _react.PropTypes.string;
 function ui(key) {
   var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -74,32 +70,6 @@ function ui(key) {
 
   return function (WrappedComponent) {
     var _class, _temp;
-
-    if (WrappedComponent.propTypes && _typeof(WrappedComponent.propTypes) === 'object') {
-      WrappedComponent.propTypes = _extends({
-        updateUI: _react.PropTypes.func.isRequired
-      }, WrappedComponent.propTypes);
-
-      if (opts.state && _typeof(opts.state) === 'object') {
-        WrappedComponent.propTypes = _extends({
-          ui: _react.PropTypes.shape(walkUiProps(opts.state)).isRequired
-        }, WrappedComponent.propTypes);
-      }
-    }
-
-    function walkUiProps(props) {
-      var uiPropTypes = {};
-      Object.keys(props).forEach(function (key) {
-        var value = props[key];
-        if (value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
-          var shape = walkUiProps(value);
-          uiPropTypes[key] = _react.PropTypes.shape(shape);
-        } else {
-          uiPropTypes[key] = any.isRequired;
-        }
-      });
-      return uiPropTypes;
-    }
 
     // Return a parent UI class which scopes all UI state to the given key
     return connector((
@@ -368,14 +338,10 @@ function ui(key) {
           // If this slice of the UI has not changed (shallow comparison),
           // then use an old copy of the slice to prevent unnecessary
           // re-rendering
-          if (opts.shallowCompare) {
-            if (!(0, _shallowEqual2.default)(this.__previousMergeResult, result)) {
-              this.__previousMergeResult = result;
-            }
-            return this.__previousMergeResult;
-          } else {
-            return result;
+          if (!(0, _shallowEqual2.default)(this.__previousMergeResult, result)) {
+            this.__previousMergeResult = result;
           }
+          return this.__previousMergeResult;
         }
       }, {
         key: 'render',
@@ -392,34 +358,32 @@ function ui(key) {
       return UI;
     }(_react.Component), _class.propTypes = {
       // The entire global UI state via react-redux connector
-      ui: object.isRequired,
+      ui: _propTypes.object.isRequired,
       // These actions are passed via react-redux connector
-      setDefaultUI: func.isRequired,
-      updateUI: func.isRequired,
-      massUpdateUI: func.isRequired
-    }, _class.childContextTypes = {
+      setDefaultUI: _propTypes.func.isRequired,
+      updateUI: _propTypes.func.isRequired,
+      massUpdateUI: _propTypes.func.isRequired }, _class.childContextTypes = {
       // uiKey is the name of the parent context's key
-      uiKey: string,
+      uiKey: _propTypes.string,
       // uiPath is the current path of the UI context
-      uiPath: array,
+      uiPath: _propTypes.array,
       // uiVars is a map of UI variable names stored in state to the parent
       // context which controls them.
-      uiVars: object,
+      uiVars: _propTypes.object,
 
       // Actions to pass to children
-      updateUI: func,
-      resetUI: func
-    }, _class.contextTypes = {
+      updateUI: _propTypes.func,
+      resetUI: _propTypes.func }, _class.contextTypes = {
       // This is used in mergeUIProps and construct() to immediately set
       // props.
-      store: any,
+      store: _propTypes.any,
 
-      uiKey: string,
-      uiPath: array,
-      uiVars: object,
+      uiKey: _propTypes.string,
+      uiPath: _propTypes.array,
+      uiVars: _propTypes.object,
 
-      updateUI: func,
-      resetUI: func
+      updateUI: _propTypes.func,
+      resetUI: _propTypes.func
     }, _temp));
   };
-};
+}
