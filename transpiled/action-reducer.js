@@ -54,6 +54,10 @@ function reducer() {
   }
 
   switch (action.type) {
+    case "@@redux/INIT":
+      //Init comes in a with a state from redux - resetting back to our default
+      return defaultState;
+      break;
     case UPDATE_UI_STATE:
       var _action$payload = action.payload,
           name = _action$payload.name,

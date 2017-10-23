@@ -35,6 +35,10 @@ export default function reducer(state = defaultState, action) {
   }
 
   switch (action.type) {
+    case "@@redux/INIT": 
+      //Init comes in a with a state from redux - resetting back to our default
+      return(defaultState)
+    break;
     case UPDATE_UI_STATE:
       const { name, value } = action.payload;
       if (typeof value === 'function') {
