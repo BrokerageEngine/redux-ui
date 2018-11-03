@@ -3,17 +3,19 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.reducer = undefined;
+Object.defineProperty(exports, "reducer", {
+  enumerable: true,
+  get: function get() {
+    return _actionReducer.default;
+  }
+});
+exports.default = void 0;
 
-var _ui = require('./ui');
+var _ui = _interopRequireDefault(require("./ui"));
 
-var _ui2 = _interopRequireDefault(_ui);
-
-var _actionReducer = require('./action-reducer');
-
-var _actionReducer2 = _interopRequireDefault(_actionReducer);
+var _actionReducer = _interopRequireDefault(require("./action-reducer"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = _ui2.default;
-exports.reducer = _actionReducer2.default;
+var _default = _ui.default;
+exports.default = _default;

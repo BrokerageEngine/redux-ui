@@ -3,19 +3,17 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.reducerEnhancer = exports.defaultState = exports.SET_DEFAULT_UI_STATE = exports.UPDATE_UI_STATE = exports.MASS_UPDATE_UI_STATE = undefined;
 exports.default = reducer;
 exports.updateUI = updateUI;
 exports.massUpdateUI = massUpdateUI;
 exports.setDefaultUI = setDefaultUI;
 exports.unmountUI = unmountUI;
 exports.mountUI = mountUI;
+exports.reducerEnhancer = exports.defaultState = exports.SET_DEFAULT_UI_STATE = exports.UPDATE_UI_STATE = exports.MASS_UPDATE_UI_STATE = void 0;
 
-var _immutable = require('immutable');
+var _immutable = require("immutable");
 
-var _invariant = require('invariant');
-
-var _invariant2 = _interopRequireDefault(_invariant);
+var _invariant = _interopRequireDefault(require("invariant"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24,17 +22,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // key of the object to update or do transformations within one action in the
 // reducer. The latter only triggers one store change event and is more
 // performant.
-var MASS_UPDATE_UI_STATE = exports.MASS_UPDATE_UI_STATE = '@@redux-ui/MASS_UPDATE_UI_STATE';
-var UPDATE_UI_STATE = exports.UPDATE_UI_STATE = '@@redux-ui/UPDATE_UI_STATE';
-var SET_DEFAULT_UI_STATE = exports.SET_DEFAULT_UI_STATE = '@@redux-ui/SET_DEFAULT_UI_STATE';
+var MASS_UPDATE_UI_STATE = '@@redux-ui/MASS_UPDATE_UI_STATE';
+exports.MASS_UPDATE_UI_STATE = MASS_UPDATE_UI_STATE;
+var UPDATE_UI_STATE = '@@redux-ui/UPDATE_UI_STATE';
+exports.UPDATE_UI_STATE = UPDATE_UI_STATE;
+var SET_DEFAULT_UI_STATE = '@@redux-ui/SET_DEFAULT_UI_STATE'; // These are private consts used in actions only given to the UI decorator.
 
-// These are private consts used in actions only given to the UI decorator.
+exports.SET_DEFAULT_UI_STATE = SET_DEFAULT_UI_STATE;
 var MOUNT_UI_STATE = '@@redux-ui/MOUNT_UI_STATE';
 var UNMOUNT_UI_STATE = '@@redux-ui/UNMOUNT_UI_STATE';
-
-var defaultState = exports.defaultState = new _immutable.Map({
-  __reducers: new _immutable.Map({
-    // This contains a map of component paths (joined by '.') to an object
+var defaultState = new _immutable.Map({
+  __reducers: new _immutable.Map({// This contains a map of component paths (joined by '.') to an object
     // containing the fully qualified path and the reducer function:
     // 'parent.child': {
     //   path: ['parent', 'child'],
@@ -42,11 +40,11 @@ var defaultState = exports.defaultState = new _immutable.Map({
     // }
   })
 });
+exports.defaultState = defaultState;
 
 function reducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
-  var action = arguments[1];
-
+  var action = arguments.length > 1 ? arguments[1] : undefined;
   var key = action.payload && (action.payload.key || []);
 
   if (!Array.isArray(key)) {
@@ -58,6 +56,7 @@ function reducer() {
       //Init comes in a with a state from redux - resetting back to our default
       return defaultState;
       break;
+
     case UPDATE_UI_STATE:
       var _action$payload = action.payload,
           name = _action$payload.name,
@@ -68,18 +67,17 @@ function reducer() {
       } else {
         state = state.setIn(key.concat(name), value);
       }
+
       break;
 
     case MASS_UPDATE_UI_STATE:
       var _action$payload2 = action.payload,
           uiVars = _action$payload2.uiVars,
           transforms = _action$payload2.transforms;
-
       state = state.withMutations(function (s) {
         Object.keys(transforms).forEach(function (k) {
           var path = uiVars[k];
-          (0, _invariant2.default)(path, 'Couldn\'t find variable ' + k + ' within your component\'s UI state ' + ('context. Define ' + k + ' before using it in the @ui decorator'));
-
+          (0, _invariant.default)(path, "Couldn't find variable ".concat(k, " within your component's UI state ") + "context. Define ".concat(k, " before using it in the @ui decorator"));
           s.setIn(path.concat(k), transforms[k]);
         });
       });
@@ -94,14 +92,12 @@ function reducer() {
       var _action$payload3 = action.payload,
           defaults = _action$payload3.defaults,
           customReducer = _action$payload3.customReducer;
-
       state = state.withMutations(function (s) {
         // Set the defaults for the component
-        s.setIn(key, new _immutable.Map(defaults));
-
-        // If this component has a custom reducer add it to the list.
+        s.setIn(key, new _immutable.Map(defaults)); // If this component has a custom reducer add it to the list.
         // We store the reducer func and UI path for the current component
         // inside the __reducers map.
+
         if (customReducer) {
           var path = key.join('.');
           s.setIn(['__reducers', path], {
@@ -119,14 +115,15 @@ function reducer() {
       // this means that using setIn in child contexts will fail as the root
       // context will be stored as undefined in our state
       state = state.withMutations(function (s) {
-        s.deleteIn(key);
-        // Remove any custom reducers
+        s.deleteIn(key); // Remove any custom reducers
+
         s.deleteIn(['__reducers', key.join('.')]);
       });
       break;
   }
 
   var customReducers = state.get('__reducers');
+
   if (customReducers.size > 0) {
     state = state.withMutations(function (mut) {
       customReducers.forEach(function (r) {
@@ -148,11 +145,12 @@ function reducer() {
         //       top-level component?
         var path = r.path,
             func = r.func;
-
         var newState = func(mut.getIn(path), action);
+
         if (newState === undefined) {
-          throw new Error('Your custom UI reducer at path ' + path.join('.') + ' must return some state');
+          throw new Error("Your custom UI reducer at path ".concat(path.join('.'), " must return some state"));
         }
+
         mut.setIn(path, newState);
       });
       return mut;
@@ -162,15 +160,19 @@ function reducer() {
   return state;
 }
 
-var reducerEnhancer = exports.reducerEnhancer = function reducerEnhancer(customReducer) {
+var reducerEnhancer = function reducerEnhancer(customReducer) {
   return function (state, action) {
     state = reducer(state, action);
+
     if (typeof customReducer === 'function') {
       state = customReducer(state, action);
     }
+
     return state;
   };
 };
+
+exports.reducerEnhancer = reducerEnhancer;
 
 function updateUI(key, name, value) {
   return {
@@ -181,7 +183,9 @@ function updateUI(key, name, value) {
       value: value
     }
   };
-};
+}
+
+;
 
 function massUpdateUI(uiVars, transforms) {
   return {
@@ -191,10 +195,10 @@ function massUpdateUI(uiVars, transforms) {
       transforms: transforms
     }
   };
-}
-
-// Exposed to components, allowing them to reset their and all child scopes to
+} // Exposed to components, allowing them to reset their and all child scopes to
 // the default variables set up
+
+
 function setDefaultUI(key, value) {
   return {
     type: SET_DEFAULT_UI_STATE,
@@ -203,11 +207,12 @@ function setDefaultUI(key, value) {
       value: value
     }
   };
-};
+}
 
+;
 /** Private, decorator only actions **/
-
 // This is not exposed to your components; it's only used in the decorator.
+
 function unmountUI(key) {
   return {
     type: UNMOUNT_UI_STATE,
@@ -215,13 +220,15 @@ function unmountUI(key) {
       key: key
     }
   };
-};
+}
 
+;
 /**
  * Given the key/path, set of defaults and custom reducer for a UI component
  * during construction prepare the state of the UI reducer
  *
  */
+
 function mountUI(key, defaults, customReducer) {
   return {
     type: MOUNT_UI_STATE,

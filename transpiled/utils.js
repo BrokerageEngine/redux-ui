@@ -1,5 +1,4 @@
 'use strict';
-
 /**
  * getUIState inspects redux' global state store and returns the UI state node.
  *
@@ -9,9 +8,14 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var getUIState = exports.getUIState = function getUIState(state) {
+exports.getUIState = void 0;
+
+var getUIState = function getUIState(state) {
   if (typeof state.get === 'function') {
     return state.get('ui');
   }
+
   return state.ui;
 };
+
+exports.getUIState = getUIState;
