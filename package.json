@@ -2,9 +2,14 @@
   "name": "redux-ui",
   "version": "0.1.2",
   "description": "UI state management for Redux and React",
-  "main": "transpiled/index.js",
+  "main": "lib/index.js",
+  "files": ["lib"],
   "scripts": {
-    "prepublish": "$(npm bin)/babel -d transpiled src",
+    "clean": "rm -rf lib",
+    "prepare": "npm run build",
+    "prebuild": "npm run clean",
+    "build":
+      "NODE_ENV=production $(npm bin)/babel src --out-dir lib --ignore '**/*.test.js'",
     "test": "$(npm bin)/mocha  --compilers js:@babel/register --recursive --require ./test/setup.js"
   },
   "repository": {
@@ -24,8 +29,8 @@
   },
   "homepage": "https://github.com/BrokerageEngine/redux-ui#readme",
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "@babel/plugin-proposal-decorators": "^7.0.0",
     "@babel/plugin-proposal-do-expressions": "^7.0.0",
@@ -42,15 +47,15 @@
     "@babel/plugin-proposal-throw-expressions": "^7.0.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-syntax-import-meta": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
     "chai": "^3.4.1",
     "jsdom": "^7.2.1",
     "mocha": "^5.2.0",
-    "react-dom": "16.6.0"
+    "react-dom": "16.6.0",
+    "@babel/register": "^7.0.0"
   },
   "dependencies": {
-    "@babel/register": "^7.0.0",
     "immutable": "^3.8.2",
     "invariant": "^2.2.0",
     "prop-types": "^15.5.7",
