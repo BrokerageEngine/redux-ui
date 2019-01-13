@@ -1,20 +1,20 @@
-'use strict';
+"use strict";
 
-import { Map } from 'immutable';
-import invariant from 'invariant'
+import { Map } from "immutable";
+import invariant from "invariant";
 
 // For updating multiple UI variables at once.  Each variable might be part of
 // a different context; this means that we need to either call updateUI on each
 // key of the object to update or do transformations within one action in the
 // reducer. The latter only triggers one store change event and is more
 // performant.
-export const MASS_UPDATE_UI_STATE = '@@redux-ui/MASS_UPDATE_UI_STATE';
-export const UPDATE_UI_STATE = '@@redux-ui/UPDATE_UI_STATE';
-export const SET_DEFAULT_UI_STATE = '@@redux-ui/SET_DEFAULT_UI_STATE';
+export const MASS_UPDATE_UI_STATE = "@@redux-ui/MASS_UPDATE_UI_STATE";
+export const UPDATE_UI_STATE = "@@redux-ui/UPDATE_UI_STATE";
+export const SET_DEFAULT_UI_STATE = "@@redux-ui/SET_DEFAULT_UI_STATE";
 
 // These are private consts used in actions only given to the UI decorator.
-const MOUNT_UI_STATE = '@@redux-ui/MOUNT_UI_STATE';
-const UNMOUNT_UI_STATE = '@@redux-ui/UNMOUNT_UI_STATE';
+const MOUNT_UI_STATE = "@@redux-ui/MOUNT_UI_STATE";
+const UNMOUNT_UI_STATE = "@@redux-ui/UNMOUNT_UI_STATE";
 
 export const defaultState = new Map({
   __reducers: new Map({
@@ -35,13 +35,13 @@ export default function reducer(state = defaultState, action) {
   }
 
   switch (action.type) {
-    case "@@redux/INIT": 
+    case "@@redux/INIT":
       //Init comes in a with a state from redux - resetting back to our default
-      return(defaultState)
-    break;
+      return defaultState;
+      break;
     case UPDATE_UI_STATE:
       const { name, value } = action.payload;
-      if (typeof value === 'function') {
+      if (typeof value === "function") {
         state = state.updateIn(key.concat(name), value);
       } else {
         state = state.setIn(key.concat(name), value);
@@ -50,13 +50,13 @@ export default function reducer(state = defaultState, action) {
 
     case MASS_UPDATE_UI_STATE:
       const { uiVars, transforms } = action.payload;
-      state = state.withMutations( s => {
+      state = state.withMutations(s => {
         Object.keys(transforms).forEach(k => {
           const path = uiVars[k];
           invariant(
             path,
             `Couldn't find variable ${k} within your component's UI state ` +
-            `context. Define ${k} before using it in the @ui decorator`
+              `context. Define ${k} before using it in the @ui decorator`
           );
 
           s.setIn(path.concat(k), transforms[k]);
@@ -71,7 +71,7 @@ export default function reducer(state = defaultState, action) {
 
     case MOUNT_UI_STATE:
       const { defaults, customReducer } = action.payload;
-      state = state.withMutations( s => {
+      state = state.withMutations(s => {
         // Set the defaults for the component
         s.setIn(key, new Map(defaults));
 
@@ -79,8 +79,8 @@ export default function reducer(state = defaultState, action) {
         // We store the reducer func and UI path for the current component
         // inside the __reducers map.
         if (customReducer) {
-          let path = key.join('.');
-          s.setIn(['__reducers', path], {
+          let path = key.join(".");
+          s.setIn(["__reducers", path], {
             path: key,
             func: customReducer
           });
@@ -94,15 +94,15 @@ export default function reducer(state = defaultState, action) {
       // We have to use deleteIn as react unmounts root components first;
       // this means that using setIn in child contexts will fail as the root
       // context will be stored as undefined in our state
-      state= state.withMutations(s => {
+      state = state.withMutations(s => {
         s.deleteIn(key);
         // Remove any custom reducers
-        s.deleteIn(['__reducers', key.join('.')]);
+        s.deleteIn(["__reducers", key.join(".")]);
       });
       break;
   }
 
-  const customReducers = state.get('__reducers');
+  const customReducers = state.get("__reducers");
   if (customReducers.size > 0) {
     state = state.withMutations(mut => {
       customReducers.forEach(r => {
@@ -125,9 +125,11 @@ export default function reducer(state = defaultState, action) {
         const { path, func } = r;
         const newState = func(mut.getIn(path), action);
         if (newState === undefined) {
-          throw new Error(`Your custom UI reducer at path ${path.join('.')} must return some state`);
+          // Mute exception
+          // throw new Error(`Your custom UI reducer at path ${path.join('.')} must return some state`);
+        } else {
+          mut.setIn(path, newState);
         }
-        mut.setIn(path, newState);
       });
       return mut;
     });
@@ -136,13 +138,13 @@ export default function reducer(state = defaultState, action) {
   return state;
 }
 
-export const reducerEnhancer = (customReducer) => (state, action) => {
+export const reducerEnhancer = customReducer => (state, action) => {
   state = reducer(state, action);
-  if (typeof customReducer === 'function') {
+  if (typeof customReducer === "function") {
     state = customReducer(state, action);
   }
   return state;
-}
+};
 
 export function updateUI(key, name, value) {
   return {
@@ -153,7 +155,7 @@ export function updateUI(key, name, value) {
       value
     }
   };
-};
+}
 
 export function massUpdateUI(uiVars, transforms) {
   return {
@@ -175,7 +177,7 @@ export function setDefaultUI(key, value) {
       value
     }
   };
-};
+}
 
 /** Private, decorator only actions **/
 
@@ -187,7 +189,7 @@ export function unmountUI(key) {
       key
     }
   };
-};
+}
 
 /**
  * Given the key/path, set of defaults and custom reducer for a UI component
@@ -202,5 +204,5 @@ export function mountUI(key, defaults, customReducer) {
       defaults,
       customReducer
     }
-  }
+  };
 }

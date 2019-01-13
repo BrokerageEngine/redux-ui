@@ -1,41 +1,41 @@
-'use strict';
+"use strict";
 
 import {
   reducer,
   reducerEnhancer,
   UPDATE_UI_STATE
-} from '../../src/action-reducer.js';
+} from "../../src/action-reducer.js";
 
-import { assert } from 'chai';
-import { is, Map } from 'immutable';
-import { Provider } from 'react-redux';
-import { createStore, combineReducers } from 'redux';
-import { defaultState } from '../../src/action-reducer.js';
+import { assert } from "chai";
+import { is, Map } from "immutable";
+import { Provider } from "react-redux";
+import { createStore, combineReducers } from "redux";
+import { defaultState } from "../../src/action-reducer.js";
 
 const customReducer = (state, action) => {
-  if (action.type === 'CUSTOM_ACTION_TYPE') {
-    return state.set('isHooked', true);
+  if (action.type === "CUSTOM_ACTION_TYPE") {
+    return state.set("isHooked", true);
   }
   return state;
-}
+};
 const enhancedReducer = reducerEnhancer(customReducer);
 
-describe('reducerEnhancer', () => {
+describe("reducerEnhancer", () => {
   let enhancedStore;
 
-  beforeEach( () => {
+  beforeEach(() => {
     enhancedStore = createStore(combineReducers({ ui: enhancedReducer }));
   });
 
-  it('delegates to the default reducer', () => {
+  it("delegates to the default reducer", () => {
     assert.isTrue(is(enhancedStore.getState().ui, defaultState));
 
     enhancedStore.dispatch({
       type: UPDATE_UI_STATE,
       payload: {
-        key: 'a',
-        name: 'foo',
-        value: 'bar'
+        key: "a",
+        name: "foo",
+        value: "bar"
       }
     });
 
@@ -44,19 +44,19 @@ describe('reducerEnhancer', () => {
         enhancedStore.getState().ui,
         new Map({
           __reducers: new Map(),
-          a: new Map({ foo: 'bar' })
+          a: new Map({ foo: "bar" })
         })
       )
     );
   });
 
-  it('intercepts custom actions', () => {
+  it("intercepts custom actions", () => {
     assert.isTrue(is(enhancedStore.getState().ui, defaultState));
 
     enhancedStore.dispatch({
-      type: 'CUSTOM_ACTION_TYPE',
+      type: "CUSTOM_ACTION_TYPE",
       payload: {
-        foo: 'bar'
+        foo: "bar"
       }
     });
     assert.isTrue(
@@ -70,23 +70,23 @@ describe('reducerEnhancer', () => {
     );
   });
 
-  it('update ui state by updater', () => {
+  it("update ui state by updater", () => {
     assert.isTrue(is(enhancedStore.getState().ui, defaultState));
 
     enhancedStore.dispatch({
       type: UPDATE_UI_STATE,
       payload: {
-        key: 'foo',
-        name: 'bar',
-        value: 'baz'
+        key: "foo",
+        name: "bar",
+        value: "baz"
       }
     });
 
     enhancedStore.dispatch({
       type: UPDATE_UI_STATE,
       payload: {
-        key: 'foo',
-        name: 'bar',
+        key: "foo",
+        name: "bar",
         value: baz => baz.toUpperCase()
       }
     });
@@ -96,7 +96,7 @@ describe('reducerEnhancer', () => {
         enhancedStore.getState().ui,
         new Map({
           __reducers: new Map(),
-          foo: new Map({ bar: 'BAZ' })
+          foo: new Map({ bar: "BAZ" })
         })
       )
     );
